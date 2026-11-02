@@ -76,6 +76,8 @@ test.describe('Escape, Tab and typing in the tags input @bookings', () => {
       test.skip()
       return
     }
+    const tags = edit.dialog.locator('input[type=hidden][name=tags]')
+    const tagsBefore = await tags.inputValue()
     await edit.tagsInput.press('a')
     await expect(edit.tagsInput).toHaveAttribute('aria-expanded', 'true')
 
@@ -83,6 +85,7 @@ test.describe('Escape, Tab and typing in the tags input @bookings', () => {
     await expect(edit.tagsInput).toHaveAttribute('aria-expanded', 'false')
     await expect(edit.dialog).toBeVisible()
     await expect(edit.tagsInput).toBeFocused()
+    await expect(tags).toHaveValue(tagsBefore)
 
     await edit.tagsInput.press('b')
     await expect(edit.tagsInput).toHaveAttribute('aria-expanded', 'true')
@@ -92,9 +95,64 @@ test.describe('Escape, Tab and typing in the tags input @bookings', () => {
     await expect(edit.tagsInput).toHaveAttribute('aria-expanded', 'false')
     await expect(edit.dialog).toBeVisible()
   })
+
+  test('Escape on the closed list closes the edit dialog and does not clear the tags', async ({
+    page,
+  }) => {
+    const edit = await openEditDialog(page)
+    if (!edit) {
+      test.skip()
+      return
+    }
+    await expect(edit.tagsInput).toHaveAttribute('aria-expanded', 'false')
+
+    // Base UI clears the tags on a closed list and stops the event, so the dialog would stay open.
+    await edit.tagsInput.press('Escape')
+
+    await expect(edit.dialog).toBeHidden()
+  })
+
+  test('a list that the focus opened closes when the focus leaves to the page body', async ({
+    page,
+  }) => {
+    await page.goto('/user/home')
+    await pickFirstProject(page)
+    const tagsInput = page.getByRole('combobox', { name: /tags/i }).locator('visible=true').first()
+    await expect(tagsInput).toBeFocused({ timeout: 5000 })
+    await expect(tagsInput).toHaveAttribute('aria-expanded', 'true')
+
+    await tagsInput.blur()
+
+    await expect(tagsInput).toHaveAttribute('aria-expanded', 'false')
+  })
 })
 
 test.describe('Enter in the tags input @bookings', () => {
+  test('Enter on the empty input of the quick start form submits and adds no suggestion', async ({
+    page,
+  }) => {
+    await page.goto('/user/home')
+    await pickFirstProject(page)
+    const tagsInput = page.getByRole('combobox', { name: /tags/i }).locator('visible=true').first()
+    await expect(tagsInput).toBeFocused({ timeout: 5000 })
+    await expect(tagsInput).toHaveAttribute('aria-expanded', 'true')
+    const tags = page.locator('form', { has: tagsInput }).locator('input[type=hidden][name=tags]')
+    await expect(tags).toHaveValue('')
+
+    // The test starts no booking: the proxy aborts every call that is not a read.
+    const isWrite = (postData: null | string) => !(postData ?? '').includes('"method":"GET"')
+    await page.route('**/api/proxy**', (route) =>
+      isWrite(route.request().postData()) ? route.abort() : route.continue(),
+    )
+    const submit = page.waitForRequest(
+      (request) => request.url().includes('/api/proxy') && isWrite(request.postData()),
+    )
+    await tagsInput.press('Enter')
+
+    await submit
+    await expect(tags).toHaveValue('')
+  })
+
   test('the quick start form adds the typed tag and does not submit', async ({ page }) => {
     await page.goto('/user/home')
     const tagsInput = page.getByRole('combobox', { name: /tags/i }).locator('visible=true').first()

@@ -25,8 +25,8 @@ type GuardedKeyEvent = {
 
 /**
  * Keeps two keyboard rules of the former Headless UI comboboxes for a Base UI `Combobox.Input`.
- * Pass it as `onKeyDown`; it runs before the Base UI handler. `isListOpen` is the list that the
- * user opened, not a list that shows on focus.
+ * Pass it as `onKeyDown`; it runs before the Base UI handler. Pass the open state from `onOpenChange`
+ * as `isListOpen`. A caller that handles Enter itself, such as the tags input, also counts its own open.
  */
 export const guardComboboxKey = (event: GuardedKeyEvent, isListOpen: boolean): void => {
   // Base UI lets Enter submit the form when no item is highlighted.
