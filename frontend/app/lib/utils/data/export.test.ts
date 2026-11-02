@@ -126,7 +126,7 @@ describe('exportBookingList', () => {
     expect(rows).toEqual([])
   })
 
-  it('writes one row with the duration as an [h]:mm day fraction', () => {
+  it('writes one row with the duration as decimal hours in a number cell', () => {
     const { buffer } = exportBookingList([booking], 'xlsx')
     const wb = XLSX.read(buffer, { cellNF: true, type: 'array' })
     const ws = wb.Sheets['Bookings']!
@@ -141,8 +141,19 @@ describe('exportBookingList', () => {
       user: 'user1',
     })
     expect(ws['G1']?.v).toBe('duration')
-    expect(ws['G2']?.v).toBeCloseTo(1.5 / 24)
-    expect(ws['G2']?.z).toBe('[h]:mm')
+    expect(ws['G2']?.t).toBe('n')
+    expect(ws['G2']?.v).toBe(1.5)
+    expect(ws['G2']?.w).toBe('1.5')
+  })
+
+  it('writes the ODS duration as decimal hours, not as a repeat of durationString', () => {
+    const { buffer } = exportBookingList([booking], 'ods')
+    const wb = XLSX.read(buffer, { type: 'array' })
+    const [row] = XLSX.utils.sheet_to_json<Record<string, unknown>>(wb.Sheets['Bookings']!, {
+      raw: true,
+    })
+
+    expect(row).toMatchObject({ duration: 1.5, durationString: '01:30' })
   })
 
   it('writes a CSV with a header line and one data line', () => {

@@ -111,13 +111,10 @@ export const exportBookingList = (
   options?: ExportOptions,
 ): { buffer: Uint8Array; filename: string } => {
   const bookings = getExtendedModelsBookingList(rawBookings)
-  const isCsv = format === 'csv'
 
   const data = bookings.map((item) => ({
-    // CSV writes the formatted text of a cell, so [h]:mm repeats durationString. CSV gets decimal hours.
-    duration: isCsv
-      ? Math.round(item.duration * 100) / 100
-      : Math.round(item.duration * 60) / 60 / 24,
+    // Decimal hours for billing. An [h]:mm time cell showed the same text as durationString.
+    duration: Math.round(item.duration * 100) / 100,
     durationString: item.durationString,
     end: item.end ? modelsLocalDateTimeWithTimeZoneToString(item.end) : '',
     organisation: item.organisationReference.key,
@@ -127,19 +124,8 @@ export const exportBookingList = (
     user: item.userReference.key,
   }))
 
+  // Every format writes the same values. The duration stays a number cell, which issue #393 requires.
   const ws = XLSX.utils.json_to_sheet(data, { header: [...BOOKING_COLUMNS] })
-
-  const durationCol = BOOKING_COLUMNS.indexOf('duration')
-  if (!isCsv && ws['!ref']) {
-    const range = XLSX.utils.decode_range(ws['!ref'])
-    for (let row = range.s.r + 1; row <= range.e.r; row++) {
-      const addr = XLSX.utils.encode_cell({ c: durationCol, r: row })
-      const cell = ws[addr]
-      if (cell) {
-        cell.z = '[h]:mm'
-      }
-    }
-  }
 
   const wb = XLSX.utils.book_new()
   XLSX.utils.book_append_sheet(wb, ws, 'Bookings')
